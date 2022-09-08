@@ -1,5 +1,5 @@
 import infrastructure.InMemoryUsersRepository
-import application.RegisterUser
+import action.RegisterUser
 import domain.User
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -11,11 +11,11 @@ class RegisterUserShould {
         //given
 
         //when
-        val registerUser = RegisterUser()
+        val repository = InMemoryUsersRepository()
+        val registerUser = RegisterUser(repository)
         registerUser(USER_1.name, USER_1.nickName)
 
         //then
-        val repository = InMemoryUsersRepository
         val result = repository.find(USER_1.nickName)
         assertEquals(USER_1,result)
     }
@@ -25,11 +25,11 @@ class RegisterUserShould {
         //given
 
         //when
-        val registerUser = RegisterUser()
+        val repository = InMemoryUsersRepository()
+        val registerUser = RegisterUser(repository)
         registerUser(USER_2.name, USER_2.nickName)
 
         //then
-        val repository = InMemoryUsersRepository
         val result = repository.find(USER_2.nickName)
         assertEquals(USER_2,result)
     }
