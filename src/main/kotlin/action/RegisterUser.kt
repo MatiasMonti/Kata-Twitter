@@ -1,6 +1,5 @@
 package action
 
-import domain.User
 import domain.exceptions.ExistingUserException
 import infrastructure.UsersRepository
 
