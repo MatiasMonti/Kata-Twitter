@@ -11,6 +11,11 @@ class InMemoryUsersRepository : UsersRepository {
     }
 
     override fun find(nickName:String): User {
+
         return users.first { it.nickName == nickName }
+    }
+
+    override fun exist(nickName: String): Boolean {
+        return users.map { it.nickName }.contains(nickName)
     }
 }

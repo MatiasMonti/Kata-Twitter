@@ -1,9 +1,14 @@
 package action
 
+import domain.User
+import domain.exceptions.ExistingUserException
 import infrastructure.UsersRepository
 
 class RegisterUser(private val repository : UsersRepository) {
     operator fun invoke(name: String, nickName: String) {
-        repository.save(name, nickName)
+        if(repository.exist(nickName)){
+            throw ExistingUserException()
+        }
+        else repository.save(name, nickName)
     }
 }
