@@ -1,21 +1,21 @@
 package infrastructure
 
 import domain.User
+import domain.repositories.UsersRepository
 
 class InMemoryUsersRepository : UsersRepository {
 
     private val users = mutableListOf<User>()
 
-    override fun save(name:String, nickname: String){
-        users.add(User(name,nickname))
+    override fun save(user : User){
+        users.add(user)
     }
 
-    override fun find(nickName:String): User {
-
-        return users.first { it.nickName == nickName }
+    override fun find(nickName:String): User? {
+        return users.firstOrNull() { it.nickName == nickName }
     }
 
-    override fun exist(nickName: String): Boolean {
-        return users.map { it.nickName }.contains(nickName)
+    override fun update(updatedUser: User) {
+        users[users.indexOf(find(updatedUser.nickName))] = updatedUser
     }
 }
