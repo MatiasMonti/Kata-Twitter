@@ -1,10 +1,10 @@
 package domain.factories
 
-import domain.User
+import domain.objects.User
 
 object UserFactory {
 
-    fun create(name : String, nickname : String) : User? {
-        return if(nickname[0] == '@') User(name,nickname) else null
+    fun create(name : String, nickname : String) : User {
+        return if(nickname[0] == '@') User(name,nickname) else throw ExceptionInInitializerError()
     }
 }

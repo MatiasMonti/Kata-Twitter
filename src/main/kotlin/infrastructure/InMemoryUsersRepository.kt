@@ -1,6 +1,6 @@
 package infrastructure
 
-import domain.User
+import domain.objects.User
 import domain.repositories.UsersRepository
 
 class InMemoryUsersRepository : UsersRepository {

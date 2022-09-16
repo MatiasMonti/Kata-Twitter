@@ -1,19 +1,20 @@
 package infrastructure
 
-import domain.FollowRelationship
 import domain.repositories.FollowersRepository
 
 class InMemoryFollowersRepository : FollowersRepository {
 
-    private val followersList = mutableSetOf<FollowRelationship>()
+    private val followersMap = mutableMapOf<String, MutableList<String>>()
 
 
-    override fun saveFollower( followRelationship : FollowRelationship) {
-        followersList.add(followRelationship)
+    override fun saveFollower( followerNickname : String, followedNickname : String) {
+        val updatedFollowerList = followersMap[followerNickname]?: mutableListOf()
+        updatedFollowerList.add(followerNickname)
+        followersMap[followedNickname] = updatedFollowerList
     }
 
-    override fun findFollowers(nickName: String): List<FollowRelationship> {
-        return followersList.sortedBy { it.followedNick == nickName }
+    override fun findFollowers(followedNickname: String): List<String>? {
+        return followersMap[followedNickname]?.toList()
     }
 
 

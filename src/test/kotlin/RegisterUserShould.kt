@@ -3,155 +3,73 @@ import infrastructure.InMemoryUsersRepository
 import domain.factories.UserFactory
 import domain.services.UserService
 import domain.exceptions.ExistingUserException
-import domain.services.FollowerService
-import infrastructure.InMemoryFollowersRepository
+import domain.objects.User
+import domain.repositories.UsersRepository
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
 class RegisterUserShould {
 
+    private lateinit var repository: UsersRepository
+    private lateinit var userService: UserService
+    private lateinit var registerUser: RegisterUser
+    private lateinit var result: String
+
+    @BeforeEach
+    internal fun setUp() {
+        repository = InMemoryUsersRepository()
+        userService = UserService(repository)
+        registerUser = RegisterUser(userService)
+
+    }
     @Test
     internal fun `Register an user`() {
-        //given
-        val repository = InMemoryUsersRepository()
-        val userService = UserService(repository)
-
-        //when
-        val registerUser = RegisterUser(userService)
-        registerUser(USER_1.name, USER_1.nickName)
-
-        //then
-        val result = repository.find(USER_1.nickName)
-        assertEquals(USER_1,result)
+        whenRegister(USER_1)
+        thenUserIsFound(USER_1)
     }
-
     @Test
     internal fun `register another user`() {
-        //given
-        val repository = InMemoryUsersRepository()
-        val userService = UserService(repository)
-
-        //when
-        val registerUser = RegisterUser(userService)
-        registerUser(USER_2.name, USER_2.nickName)
-
-        //then
-        val result = repository.find(USER_2.nickName)
-        assertEquals(USER_2,result)
+        whenRegister(USER_2)
+        thenUserIsFound(USER_2)
     }
+
     @Test
     internal fun `register existing user nickname`() {
-        //given
-        var result  = ""
-        val repository = InMemoryUsersRepository()
-        val userService = UserService(repository)
 
-        //when
-        val registerUser = RegisterUser(userService)
-        registerUser(USER_2.name, USER_2.nickName)
+        givenRegisteredUser(USER_2)
+        whenRegisterExistingUser(USER_2)
+        thenExceptionIsThrew(ExistingUserException())
+    }
 
-        try{
-            registerUser(USER_2.name, USER_2.nickName)
-        }catch (e : Throwable){
+    private fun thenExceptionIsThrew(exception: Throwable) {
+        assertEquals(exception.message, result)
+    }
+
+    private fun givenRegisteredUser(user : User) {
+        repository.save(user)
+    }
+
+    private fun whenRegister(user: User) {
+        registerUser(user.name, user.nickName)
+    }
+
+    private fun whenRegisterExistingUser(user : User) {
+        try {
+            registerUser(user.name, user.nickName)
+        } catch (e: Throwable) {
             result = e.message.toString()
         }
-        //then
-        assertEquals(ExistingUserException().message,result)
     }
-    @Test
-    internal fun `update an existing User`() {
-        //given
-        val repository = InMemoryUsersRepository()
-        val userService = UserService(repository)
 
-        //when
-        val registerUser = RegisterUser(userService)
-        val updateUser = UpdateUser(userService)
-        registerUser(USER_2.name, USER_2.nickName)
-        updateUser(USER_2_UPDATED_NAME, USER_2.nickName)
-
-        //then
-        val result = repository.find(USER_2.nickName)!!.name
-        assertEquals(USER_2_UPDATED_NAME, result)
-    }
-    @Test
-    internal fun `follow an user and get followers list`() {
-        //given
-        val usersRepository = InMemoryUsersRepository()
-        val userService = UserService(usersRepository)
-        val followerServiceService = FollowerService(InMemoryFollowersRepository(),usersRepository)
-
-        //when
-        val registerUser = RegisterUser(userService)
-        val followUser = FollowUser(followerServiceService)
-        val getFollowers = GetFollowers(followerServiceService)
-        registerUser(USER_2.name, USER_2.nickName)
-        registerUser(USER_1.name, USER_1.nickName)
-        followUser(USER_1.nickName,USER_2.nickName)
-
-        //then
-        val result = getFollowers(USER_2.nickName)
-        assertEquals(listOf(USER_1.nickName), result)
-    }
-    @Test
-    internal fun `get followers for user without followers`() {
-        //given
-        val usersRepository = InMemoryUsersRepository()
-        val userService = UserService(usersRepository)
-        val followerServiceService = FollowerService(InMemoryFollowersRepository(),usersRepository)
-
-        //when
-        val registerUser = RegisterUser(userService)
-        val getFollowers = GetFollowers(followerServiceService)
-        registerUser(USER_2.name, USER_2.nickName)
-
-        //then
-        val result = getFollowers(USER_2.nickName)
-        assertEquals(listOf(), result)
-    }
-    @Test
-    internal fun `user can follow other use only once`() {
-        //given
-        val usersRepository = InMemoryUsersRepository()
-        val userService = UserService(usersRepository)
-        val followerServiceService = FollowerService(InMemoryFollowersRepository(),usersRepository)
-
-        //when
-        val registerUser = RegisterUser(userService)
-        val followUser = FollowUser(followerServiceService)
-        val getFollowers = GetFollowers(followerServiceService)
-        registerUser(USER_2.name, USER_2.nickName)
-        registerUser(USER_1.name, USER_1.nickName)
-        followUser(USER_1.nickName,USER_2.nickName)
-        followUser(USER_1.nickName,USER_2.nickName)
-
-        //then
-        val result = getFollowers(USER_2.nickName)
-        assertEquals(listOf(USER_1.nickName), result)
-    }
-    @Test
-    internal fun `only users can follow`() {
-        //given
-        val usersRepository = InMemoryUsersRepository()
-        val userService = UserService(usersRepository)
-        val followerServiceService = FollowerService(InMemoryFollowersRepository(),usersRepository)
-
-        //when
-        val registerUser = RegisterUser(userService)
-        val followUser = FollowUser(followerServiceService)
-        val getFollowers = GetFollowers(followerServiceService)
-        registerUser(USER_2.name, USER_2.nickName)
-        followUser(USER_2_UPDATED_NAME,USER_2.nickName)
-
-        //then
-        val result = getFollowers(USER_2.nickName)
-        assertEquals(listOf(), result)
+    private fun thenUserIsFound(user: User) {
+        val result = repository.find(user.nickName)
+        assertEquals(user, result)
     }
 
     private companion object {
-        val USER_1 = UserFactory.create("Matias Sebastian", "@kenny")!!
-        val USER_2 = UserFactory.create("Juan Manuel", "@dopa")!!
-        const val USER_2_UPDATED_NAME = "Juan M."
+        val USER_1 = UserFactory.create("Matias Sebastian", "@kenny")
+        val USER_2 = UserFactory.create("Juan Manuel", "@dopa")
     }
 }
 

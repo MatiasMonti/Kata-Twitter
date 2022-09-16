@@ -1,10 +1,8 @@
 package domain.repositories
 
-import domain.FollowRelationship
-
 interface FollowersRepository {
 
-    fun saveFollower(followRelationship : FollowRelationship)
+    fun saveFollower( followerNickname : String, followedNickname : String)
 
-    fun findFollowers(nickName:String): List<FollowRelationship>
+    fun findFollowers(followedNickname:String): List<String>?
 }

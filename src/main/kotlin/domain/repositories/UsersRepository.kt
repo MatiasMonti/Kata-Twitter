@@ -1,6 +1,6 @@
 package domain.repositories
 
-import domain.User
+import domain.objects.User
 
 interface UsersRepository {
 

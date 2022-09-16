@@ -1,20 +1,14 @@
 package domain.services
 
-import domain.factories.FollowRelationshipFactory
 import domain.repositories.FollowersRepository
-import domain.repositories.UsersRepository
 
-class FollowerService(private val followerRepository : FollowersRepository,private val userRepository : UsersRepository) {
+class FollowerService(private val followedRepository : FollowersRepository) {
 
     fun followUser(userNickName: String, userToFollowNickName: String) {
-
-        val followRelationShip = FollowRelationshipFactory.create(userNickName,userToFollowNickName,userRepository)
-        if(!followerRepository.findFollowers(userToFollowNickName).contains(followRelationShip)){
-            followRelationShip?.let { followerRepository.saveFollower(it) }
-        }
+        followedRepository.saveFollower(userNickName,userToFollowNickName)
     }
 
     fun getFollowers(nickName: String): List<String> {
-        return followerRepository.findFollowers(nickName).map { it.followerNick}
+        return followedRepository.findFollowers(nickName)?: listOf()
     }
 }
