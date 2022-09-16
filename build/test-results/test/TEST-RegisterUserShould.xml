@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="RegisterUserShould" tests="3" skipped="0" failures="0" errors="0" timestamp="2022-09-16T02:33:20" hostname="DESKTOP-BQ618PG" time="0.003">
-  <properties/>
-  <testcase name="Register an user$Kata_Twitter()" classname="RegisterUserShould" time="0.001"/>
-  <testcase name="register another user$Kata_Twitter()" classname="RegisterUserShould" time="0.001"/>
-  <testcase name="register existing user nickname$Kata_Twitter()" classname="RegisterUserShould" time="0.0"/>
-  <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>
